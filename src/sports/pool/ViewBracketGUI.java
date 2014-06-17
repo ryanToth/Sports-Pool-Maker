@@ -48,6 +48,8 @@ public class ViewBracketGUI extends JFrame {
                 teamOptions[j].setBackground(Color.yellow);
             else if (participant.correctPicks[j].equals("red"))
                 teamOptions[j].setBackground(Color.red);
+            else
+                teamOptions[j].setBackground(Color.white);
         }
         
         int i = 0;
@@ -71,26 +73,32 @@ public class ViewBracketGUI extends JFrame {
         }
         
         add(new JLabel());
-        add(new JLabel());
         
-        JLabel colorExplanation1 = new JLabel("Green: Correct Placement");
+        JLabel colorExplanation1 = new JLabel("Correct Placement");
         colorExplanation1.setOpaque(true);
         colorExplanation1.setBackground(Color.green);
         colorExplanation1.setHorizontalAlignment(JLabel.CENTER);
         colorExplanation1.setBorder(BorderFactory.createLineBorder(Color.black));
         
-        JLabel colorExplanation2 = new JLabel("Yellow: Wrong Placement");
+        JLabel colorExplanation2 = new JLabel("Incorrect Placement");
         colorExplanation2.setOpaque(true);
         colorExplanation2.setBackground(Color.yellow);
         colorExplanation2.setHorizontalAlignment(JLabel.CENTER);
         colorExplanation2.setBorder(BorderFactory.createLineBorder(Color.black));
         
-        JLabel colorExplanation3 = new JLabel("Red: Incorrect Pick");
+        JLabel colorExplanation3 = new JLabel("Incorrect Pick");
         colorExplanation3.setOpaque(true);
         colorExplanation3.setBackground(Color.red);
         colorExplanation3.setHorizontalAlignment(JLabel.CENTER);
         colorExplanation3.setBorder(BorderFactory.createLineBorder(Color.black));
         
+        JLabel colorExplanation4 = new JLabel("Awaiting Results");
+        colorExplanation4.setOpaque(true);
+        colorExplanation4.setBackground(Color.white);
+        colorExplanation4.setHorizontalAlignment(JLabel.CENTER);
+        colorExplanation4.setBorder(BorderFactory.createLineBorder(Color.black));
+        
+        add(colorExplanation4);
         add(colorExplanation1);
         add(colorExplanation2);
         add(colorExplanation3);

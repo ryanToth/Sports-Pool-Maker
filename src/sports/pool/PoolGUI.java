@@ -203,7 +203,10 @@ public class PoolGUI extends JFrame {
                             pool.participants.get(i).correctPicks[j] = "green";
                             gotPoint = true;
                         }
-                        if (pool.master.roundPicks[k].equals("")) tournementCompleted = false;
+                        if (pool.master.roundPicks[k].equals("")) {
+                            tournementCompleted = false;
+                            pool.participants.get(i).correctPicks[k] = "";
+                        }
                         k++;
                     }
                 }
