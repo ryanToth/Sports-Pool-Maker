@@ -38,8 +38,11 @@ public class FillOutBracketGUI extends JFrame {
     
     public FillOutBracketGUI(String[] teams, Participant participant, boolean master) throws UnsupportedEncodingException, IOException {
         
-        setSize(1000,800);
-        setTitle(participant.name + "'s Bracket");
+        setSize(800,500);
+        
+        if (!master)
+            setTitle(participant.poolName + ": " + participant.name + "'s Bracket");
+        else setTitle(participant.poolName + ": " + participant.name + " Bracket");
         setLocationRelativeTo(null);
         setVisible(true);
         setLayout(new GridLayout(18,5));
@@ -58,11 +61,11 @@ public class FillOutBracketGUI extends JFrame {
         int i = 0;
         int j = 0;
         
-        add(new JLabel("    Round of 16"));
-        add(new JLabel("   Quarter Finals"));
-        add(new JLabel("    Semi Finals"));
-        add(new JLabel("      Finals"));
-        add(new JLabel("      Winner"));
+        add(new JLabel("         " + "    Round of 16"));
+        add(new JLabel("         " + "   Quarter Finals"));
+        add(new JLabel("         " + "    Semi Finals"));
+        add(new JLabel("         " + "      Finals"));
+        add(new JLabel("         " + "      Winner"));
         
         while (i < tableSize) {
             
@@ -148,7 +151,7 @@ public class FillOutBracketGUI extends JFrame {
                 
                 writer.println("0");
                 participant.roundPicks = roundPicks;
-                
+                //Line below cause the IDE to break if commented out for some reason ------------------------------------------
                 //if (!master)
                     participant.closeBracketWindow();
                 writer.close();

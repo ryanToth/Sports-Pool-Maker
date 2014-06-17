@@ -9,14 +9,7 @@ package sports.pool;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -30,14 +23,17 @@ public class LoadBracketGUI extends JFrame {
     JComboBox poolOptions;
     JButton done = new JButton("Done");
     LoadBracketGUI sender = this;
+    LinkedList<Participant> participants;
     
-    public LoadBracketGUI(LinkedList<Participant> participants) throws UnsupportedEncodingException, IOException {
+    public LoadBracketGUI(LinkedList<Participant> participants) {
         
         setSize(300,200);
         setTitle("Select a Participant");
         setLocationRelativeTo(null);
         setVisible(true);
         setLayout(new GridLayout(2,1));
+        
+        this.participants = participants;
         
         LinkedList<String> participantNames = new LinkedList<>();
         
@@ -60,7 +56,7 @@ public class LoadBracketGUI extends JFrame {
             public void actionPerformed(ActionEvent f) {
                 
                 if (!((String) poolOptions.getSelectedItem()).equals("")) {
-
+                    new ViewBracketGUI(participants.get(poolOptions.getSelectedIndex()-1));
                 }
             }
         });

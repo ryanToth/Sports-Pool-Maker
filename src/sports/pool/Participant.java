@@ -20,6 +20,7 @@ public class Participant implements Comparable {
     String[] roundPicks;
     FillOutBracketGUI bracket;
     String poolName;
+    String[] correctPicks = new String[31];
     boolean done = false;
     
     public Participant(String[] roundPicks, String poolName, String name, int score) {
@@ -62,6 +63,7 @@ public class Participant implements Comparable {
     }
     
     public void closeBracketWindow() {
+
         bracket.dispose();
         done = true;
     }

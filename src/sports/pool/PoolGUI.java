@@ -30,6 +30,7 @@ import javax.swing.JOptionPane;
 public class PoolGUI extends JFrame {
     
     Pool pool;
+    boolean finished = false;
     LoadPoolGUI sender;
     JButton checkBrackets = new JButton("Check Brackets");
     JButton updateMaster = new JButton("Update Master Bracket");
@@ -98,6 +99,7 @@ public class PoolGUI extends JFrame {
         add(checkBrackets);
         add(updateMaster);
         add(checkStandings);
+        //Line below cause the IDE to break for some reason ------------------------------------------
         sender.dispose();
     }
     
@@ -106,11 +108,9 @@ public class PoolGUI extends JFrame {
         checkBrackets.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent f) {
                 
-                try {
-                    new LoadBracketGUI(pool.participants);
-                } catch (IOException ex) {
-                    Logger.getLogger(PoolGUI.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                calculateScores();
+                
+                new LoadBracketGUI(pool.participants);
                 
             }
         });
@@ -142,7 +142,13 @@ public class PoolGUI extends JFrame {
                 
                 Object[] options = {"Return"};
                 
-                JOptionPane.showOptionDialog(null, standings, pool.nameOfPool + " Standings",
+                String title;
+                
+                if (finished) title = " Standings (Official)";
+                
+                else title = " Standings (Unofficial)";
+                
+                JOptionPane.showOptionDialog(null, standings, pool.nameOfPool + title,
                         JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE,
                         null, options, options[0]);
             }
@@ -153,10 +159,12 @@ public class PoolGUI extends JFrame {
         
         int[] layout = bracketLayout();
         int[] masterLayout = layout;
+        boolean tournementCompleted = true;
 
         for (int i = 0; i < pool.participants.size(); i++) {
             pool.participants.get(i).score = 0;
             for (int j = 0, l = 0; j < 31; l++) {
+                boolean gotPoint = false;
                 for (int k = 0, m = 0 ; k < 31 && layout[l] != 0 && m < 80; m++) {
 
                     if (masterLayout[m] != 0) {
@@ -164,30 +172,46 @@ public class PoolGUI extends JFrame {
                         if (layout[l] == 1 && masterLayout[m] == 1
                                 && !pool.participants.get(i).roundPicks[j].equals("") && pool.participants.get(i).roundPicks[j].equals(pool.master.roundPicks[k])) {
                             pool.participants.get(i).score++;
-                            if (j == k) pool.participants.get(i).score++;
+                            pool.participants.get(i).correctPicks[j] = "yellow";
+                            gotPoint = true;
+                            if (pool.participants.get(i).roundPicks[j].equals(pool.master.roundPicks[j])) {
+                                pool.participants.get(i).score++;
+                                pool.participants.get(i).correctPicks[j] = "green";
+                            }
                         } else if (layout[l] == 2 && masterLayout[m] == 2
                                 && !pool.participants.get(i).roundPicks[j].equals("")
                                 && pool.participants.get(i).roundPicks[j].equals(pool.master.roundPicks[k])) {
                             pool.participants.get(i).score += 3;
+                            pool.participants.get(i).correctPicks[j] = "green";
+                            gotPoint = true;
                         } else if (layout[l] == 3 && masterLayout[m] == 3
                                 && !pool.participants.get(i).roundPicks[j].equals("")
                                 && pool.participants.get(i).roundPicks[j].equals(pool.master.roundPicks[k])) {
                             pool.participants.get(i).score += 5;
+                            pool.participants.get(i).correctPicks[j] = "green";
+                            gotPoint = true;
                         } else if (layout[l] == 4 && masterLayout[m] == 4
                                 && !pool.participants.get(i).roundPicks[j].equals("")
                                 && pool.participants.get(i).roundPicks[j].equals(pool.master.roundPicks[k])) {
                             pool.participants.get(i).score += 6;
+                            pool.participants.get(i).correctPicks[j] = "green";
+                            gotPoint = true;
                         } else if (layout[l] == 5 && masterLayout[m] == 5
                                 && !pool.participants.get(i).roundPicks[j].equals("")
                                 && pool.participants.get(i).roundPicks[j].equals(pool.master.roundPicks[k])) {
                             pool.participants.get(i).score += 8;
+                            pool.participants.get(i).correctPicks[j] = "green";
+                            gotPoint = true;
                         }
+                        if (pool.master.roundPicks[k].equals("")) tournementCompleted = false;
                         k++;
                     }
                 }
+                if (!gotPoint) pool.participants.get(i).correctPicks[j] = "red";
                 if (layout[l] != 0) j++;
             }
         }
+        finished = tournementCompleted;
     }
 
     private final int[] bracketLayout() {
