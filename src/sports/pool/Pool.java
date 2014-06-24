@@ -47,15 +47,7 @@ public class Pool {
         nameOfPool = JOptionPane.showInputDialog(null, "What's the Name of the Pool?", "New Pool",1);
         
         boolean cancel = false;
-        
-        PrintWriter writer = new PrintWriter(new File("files/" + nameOfPool + ".txt"));
-        BufferedWriter poolList = new BufferedWriter(new FileWriter("files/list_of_pools.txt", true));
-        
-        poolList.append("\n" + nameOfPool);
-        poolList.close();
-        
-        writer.println(nameOfPool);
-        
+
         boolean valid = true;
         String tmp;
         
@@ -66,12 +58,9 @@ public class Pool {
             try {
                 numberOfParticipants = Integer.parseInt(tmp);
                 valid = false;
-                writer.println(numberOfParticipants);
             }
             
-            catch(Exception e) {}
-            
-            if (tmp == null) cancel = true;
+            catch(Exception e) {if (tmp == null) cancel = true;}
         }
         
         valid = true;
@@ -84,7 +73,7 @@ public class Pool {
                 numberOfTeams = Integer.parseInt(tmp) + 1;
                 valid = false;
                 teams = new String[numberOfTeams];
-                writer.println(numberOfTeams);
+                
             }
             catch(Exception e) {
                 if (tmp == null) cancel = true;
@@ -109,37 +98,57 @@ public class Pool {
             }
         }
         */
-        writer.println(4);
         
         for (int i = 1; i < numberOfTeams && !cancel; i++) {
             teams[0] = "";
-            teams[i] = JOptionPane.showInputDialog(null, "Enter Team #" + (i), "New Pool",1);
+            teams[i] = JOptionPane.showInputDialog(null, "Enter Team #" + (i), "New Pool", 1);
             if (teams[i] == null) {
                 cancel = true;
                 break;
             }
-            writer.println(teams[i]);
+
         }
         
-        
-        for (int i = 0; i < numberOfParticipants; i++) {
+        if (!cancel) {
             
-            Participant temp = new Participant(teams, nameOfPool, false);
-            participants.add(temp);
-            writer.println(temp.name);
-        }
-        
+            PrintWriter writer = new PrintWriter(new File("files/" + nameOfPool + ".txt"));
+            BufferedWriter poolList = new BufferedWriter(new FileWriter("files/list_of_pools.txt", true));
+
+            poolList.append("\n" + nameOfPool);
+            poolList.close();
+
+            writer.println(nameOfPool);
+
+            writer.println(numberOfParticipants);
+
+            writer.println(numberOfTeams);
+
+            writer.println(4);
+
+            for (int i = 1; i < numberOfTeams; i++) {
+                writer.println(teams[i]);
+            }
+
+            for (int i = 0; i < numberOfParticipants; i++) {
+
+                Participant temp = new Participant(teams, nameOfPool, false);
+                participants.add(temp);
+                writer.println(temp.name);
+            }
+
         //Make the master bracket that all others are compared to
-        PrintWriter masterWriter = new PrintWriter(new File("files/" + nameOfPool + "_Master.txt"));
-        
-        for (int i = 0; i < 31; i++)
-            masterWriter.println("");
-        masterWriter.println("0");
-        
-        masterWriter.close();
+            PrintWriter masterWriter = new PrintWriter(new File("files/" + nameOfPool + "_Master.txt"));
+
+            for (int i = 0; i < 31; i++) {
+                masterWriter.println("");
+            }
+            masterWriter.println("0");
+
+            masterWriter.close();
         //---------------------------------------------------------
-        
-        Collections.sort(participants);
-        writer.close();
+
+            Collections.sort(participants);
+            writer.close();
+        }
     }
 }
