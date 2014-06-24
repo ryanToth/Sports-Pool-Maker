@@ -25,7 +25,7 @@ public class ViewBracketGUI extends JFrame {
     public ViewBracketGUI(Participant participant) {
         
         setSize(850,500);
-        setTitle(participant.poolName + ": " + participant.name + "'s Bracket");
+        setTitle(participant.poolName + ": " + participant.name + "'s Bracket / Score: " + participant.score);
         setLocationRelativeTo(null);
         setVisible(true);
         setLayout(new GridLayout(18,5));

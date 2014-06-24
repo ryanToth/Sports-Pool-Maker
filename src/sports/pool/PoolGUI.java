@@ -164,16 +164,20 @@ public class PoolGUI extends JFrame {
         for (int i = 0; i < pool.participants.size(); i++) {
             pool.participants.get(i).score = 0;
             for (int j = 0, l = 0; j < 31; l++) {
+                
                 boolean gotPoint = false;
+                
                 for (int k = 0, m = 0 ; k < 31 && layout[l] != 0 && m < 80; m++) {
 
                     if (masterLayout[m] != 0) {
                         
                         if (layout[l] == 1 && masterLayout[m] == 1
-                                && !pool.participants.get(i).roundPicks[j].equals("") && pool.participants.get(i).roundPicks[j].equals(pool.master.roundPicks[k])) {
+                                && !pool.participants.get(i).roundPicks[j].equals("") 
+                                && pool.participants.get(i).roundPicks[j].equals(pool.master.roundPicks[k])) {
                             pool.participants.get(i).score++;
                             pool.participants.get(i).correctPicks[j] = "yellow";
                             gotPoint = true;
+                            
                             if (pool.participants.get(i).roundPicks[j].equals(pool.master.roundPicks[j])) {
                                 pool.participants.get(i).score++;
                                 pool.participants.get(i).correctPicks[j] = "green";
@@ -203,13 +207,18 @@ public class PoolGUI extends JFrame {
                             pool.participants.get(i).correctPicks[j] = "green";
                             gotPoint = true;
                         }
+                        
                         if (pool.master.roundPicks[k].equals("")) {
                             tournementCompleted = false;
-                            pool.participants.get(i).correctPicks[k] = "";
+                            
+                            if (!pool.participants.get(i).correctPicks[k].equals("yellow"))
+                                pool.participants.get(i).correctPicks[k] = "";
                         }
+                        
                         k++;
                     }
                 }
+                
                 if (!gotPoint) pool.participants.get(i).correctPicks[j] = "red";
                 if (layout[l] != 0) j++;
             }

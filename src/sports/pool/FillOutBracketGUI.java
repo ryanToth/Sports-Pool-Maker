@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -54,6 +56,16 @@ public class FillOutBracketGUI extends JFrame {
         teamOptions = new JComboBox[31];
         
         int tableSize = 80;
+        
+        LinkedList<String> sortedTeams = new LinkedList<>();
+        
+        for (int i = 0; i < teams.length; i++)
+            sortedTeams.add(teams[i]);
+        
+        Collections.sort(sortedTeams);
+        
+        for (int i = 0; i < teams.length; i++)
+            teams[i] = sortedTeams.get(i);
         
         for (int j = 0; j < teamOptions.length; j++)
             teamOptions[j] = new JComboBox(teams);

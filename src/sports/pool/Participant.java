@@ -29,6 +29,9 @@ public class Participant implements Comparable {
         this.poolName = poolName;
         this.name = name;
         this.score = score;
+        
+        for (int i = 0; i < correctPicks.length; i++)
+            correctPicks[i] = "";
     }
    
     public Participant(String[] teams, String poolName, boolean master) throws IOException {
@@ -39,6 +42,9 @@ public class Participant implements Comparable {
             while (name.equals("Master")) {
                 name = JOptionPane.showInputDialog(null, "Enter Participant's Name (Master is not a valid name)", "New Participant", 1);
             }
+            
+            for (int i = 0; i < correctPicks.length; i++)
+                correctPicks[i] = "";
         }
         
         else this.name = "Master";
