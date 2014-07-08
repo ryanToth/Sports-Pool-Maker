@@ -35,54 +35,12 @@ public class PoolGUI extends JFrame {
     JButton checkBrackets = new JButton("Check Brackets");
     JButton updateMaster = new JButton("Update Master Bracket");
     JButton checkStandings = new JButton("Check Standings");
+    PoolGUI self = this;
     
-    public PoolGUI(String poolName, LoadPoolGUI sender) throws FileNotFoundException, UnsupportedEncodingException, IOException {
+    public PoolGUI(String poolName) throws FileNotFoundException, UnsupportedEncodingException, IOException {
         
         this.sender = sender;
-        
-        FileInputStream input = new FileInputStream("files/" + poolName + ".txt");
-        BufferedReader configReader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
-        
-        String nameOfPool = configReader.readLine();
-        int numOfParticipants = Integer.parseInt(configReader.readLine());
-        int numOfTeams = Integer.parseInt(configReader.readLine());
-        int numOfRounds = Integer.parseInt(configReader.readLine());
-        String[] teams = new String[numOfTeams];
-        
-        teams[0] = "";
-        
-        for (int i = 1; i < teams.length; i++)
-            teams[i] = configReader.readLine();
-        
-        String[] participantNames = new String[numOfParticipants];
-        
-        for (int i = 0; i < participantNames.length; i++)
-            participantNames[i] = configReader.readLine();
-        
-        LinkedList<Participant> participants = new LinkedList<>();
-        
-        for (int i = 0; i < participantNames.length; i++) {
-
-            input = new FileInputStream("files/" + poolName + "_" + participantNames[i] + ".txt");
-            configReader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
-            String[] roundPicks = new String[31];
-
-            for (int j = 0; j < 31; j++) {
-                roundPicks[j] = configReader.readLine();
-            }
-            
-            participants.add(new Participant(roundPicks, poolName, participantNames[i], Integer.parseInt(configReader.readLine())));
-        }
-
-        input = new FileInputStream("files/" + poolName + "_Master.txt");
-        configReader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
-        String[] roundPicks = new String[31];
-
-        for (int j = 0; j < 31; j++) {
-            roundPicks[j] = configReader.readLine();
-        }
-
-        pool = new Pool(nameOfPool, numOfParticipants, numOfTeams, numOfRounds, teams, participants, new Participant(roundPicks, poolName, "Master", 0));
+        initPoolInfo(poolName);
         initFrame();
     }
 
@@ -93,14 +51,13 @@ public class PoolGUI extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
         setLayout(new GridLayout(1,3));
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         
         initButtons();
         
         add(checkBrackets);
         add(updateMaster);
         add(checkStandings);
-        //Line below cause the IDE to break for some reason ------------------------------------------
-        sender.dispose();
     }
     
     private final void initButtons() {
@@ -119,8 +76,9 @@ public class PoolGUI extends JFrame {
             public void actionPerformed(ActionEvent f) {
 
                 try {
-                    pool.master = new Participant(pool.teams, pool.nameOfPool, true);
-                    
+                    new PoolGUI(pool.nameOfPool);
+                    self.dispose();
+                    pool.master = new Participant(pool.teams, pool.nameOfPool, true, self);
                 } catch (IOException ex) {
                     Logger.getLogger(PoolGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -137,9 +95,23 @@ public class PoolGUI extends JFrame {
                 
                 String standings = "";
                 
-                for (int i = 0; i < pool.numberOfParticipants; i++) 
-                    standings += "#" + (i+1) + ". " + pool.participants.get(i) + "\n";
+                int j = 0;
                 
+                for (int i = 0; i < pool.numberOfParticipants; i++) {
+                    
+                    if (i > 0 && pool.participants.get(i-1).compareTo(pool.participants.get(i)) == 0)
+                        j++;
+                        
+                    if (i > 0 && pool.participants.get(i).score < pool.participants.get(i-1).score) {
+                        standings += (i + 1) + ". " + pool.participants.get(i) + "\n";
+                        j = 0;
+                    }
+                    
+                    else {
+                        standings += (i + 1 - j) + ". " + pool.participants.get(i) + "\n";
+                    }
+                }
+                    
                 Object[] options = {"Return"};
                 
                 String title;
@@ -148,9 +120,10 @@ public class PoolGUI extends JFrame {
                 
                 else title = " Standings (Unofficial)";
                 
+                
                 JOptionPane.showOptionDialog(null, standings, pool.nameOfPool + title,
                         JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE,
-                        null, options, options[0]);
+                        Icon.Icon(), options, options[0]);
             }
         });
     }
@@ -163,6 +136,17 @@ public class PoolGUI extends JFrame {
 
         for (int i = 0; i < pool.participants.size(); i++) {
             pool.participants.get(i).score = 0;
+            
+            if (!pool.master.thirdPlacePick.equals("")) {
+                if (pool.participants.get(i).thirdPlacePick.equals(pool.master.thirdPlacePick)) {
+                    pool.participants.get(i).thirdPlaceCorrectPick = "green";
+                    pool.participants.get(i).score += 7;
+                } 
+                else 
+                    pool.participants.get(i).thirdPlaceCorrectPick = "red";
+            }
+            else pool.participants.get(i).thirdPlaceCorrectPick = "";
+            
             for (int j = 0, l = 0; j < 31; l++) {
                 
                 boolean gotPoint = false;
@@ -182,25 +166,33 @@ public class PoolGUI extends JFrame {
                                 pool.participants.get(i).score++;
                                 pool.participants.get(i).correctPicks[j] = "green";
                             }
-                        } else if (layout[l] == 2 && masterLayout[m] == 2
+                        } 
+                        
+                        else if (layout[l] == 2 && masterLayout[m] == 2
                                 && !pool.participants.get(i).roundPicks[j].equals("")
                                 && pool.participants.get(i).roundPicks[j].equals(pool.master.roundPicks[k])) {
                             pool.participants.get(i).score += 3;
                             pool.participants.get(i).correctPicks[j] = "green";
                             gotPoint = true;
-                        } else if (layout[l] == 3 && masterLayout[m] == 3
+                        } 
+                        
+                        else if (layout[l] == 3 && masterLayout[m] == 3
                                 && !pool.participants.get(i).roundPicks[j].equals("")
                                 && pool.participants.get(i).roundPicks[j].equals(pool.master.roundPicks[k])) {
                             pool.participants.get(i).score += 5;
                             pool.participants.get(i).correctPicks[j] = "green";
                             gotPoint = true;
-                        } else if (layout[l] == 4 && masterLayout[m] == 4
+                        } 
+                        
+                        else if (layout[l] == 4 && masterLayout[m] == 4
                                 && !pool.participants.get(i).roundPicks[j].equals("")
                                 && pool.participants.get(i).roundPicks[j].equals(pool.master.roundPicks[k])) {
                             pool.participants.get(i).score += 6;
                             pool.participants.get(i).correctPicks[j] = "green";
                             gotPoint = true;
-                        } else if (layout[l] == 5 && masterLayout[m] == 5
+                        } 
+                        
+                        else if (layout[l] == 5 && masterLayout[m] == 5
                                 && !pool.participants.get(i).roundPicks[j].equals("")
                                 && pool.participants.get(i).roundPicks[j].equals(pool.master.roundPicks[k])) {
                             pool.participants.get(i).score += 8;
@@ -211,7 +203,7 @@ public class PoolGUI extends JFrame {
                         if (pool.master.roundPicks[k].equals("")) {
                             tournementCompleted = false;
                             
-                            if (!pool.participants.get(i).correctPicks[k].equals("yellow"))
+                            if (!pool.participants.get(i).correctPicks[k].equals("yellow") && !pool.participants.get(i).correctPicks[k].equals("green"))
                                 pool.participants.get(i).correctPicks[k] = "";
                         }
                         
@@ -247,5 +239,58 @@ public class PoolGUI extends JFrame {
         
             return layout;
         }
+    
+    private void initPoolInfo(String poolName) throws UnsupportedEncodingException, FileNotFoundException, IOException {
+        
+        FileInputStream input = new FileInputStream("files/" + poolName + ".txt");
+        BufferedReader configReader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
+        
+        String nameOfPool = configReader.readLine();
+        int numOfParticipants = Integer.parseInt(configReader.readLine());
+        int numOfTeams = Integer.parseInt(configReader.readLine());
+        int numOfRounds = Integer.parseInt(configReader.readLine());
+        String[] teams = new String[numOfTeams];
+        String thirdPlacePick;
+        
+        teams[0] = "";
+        
+        for (int i = 1; i < teams.length; i++)
+            teams[i] = configReader.readLine();
+        
+        String[] participantNames = new String[numOfParticipants];
+        
+        for (int i = 0; i < participantNames.length; i++)
+            participantNames[i] = configReader.readLine();
+        
+        LinkedList<Participant> participants = new LinkedList<>();
+        
+        for (int i = 0; i < participantNames.length; i++) {
+
+            input = new FileInputStream("files/" + poolName + "_" + participantNames[i] + ".txt");
+            configReader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
+            String[] roundPicks = new String[31];
+
+            for (int j = 0; j < 31; j++) {
+                roundPicks[j] = configReader.readLine();
+            }
+            
+            thirdPlacePick = configReader.readLine();
+            
+            participants.add(new Participant(roundPicks, poolName, participantNames[i], Integer.parseInt(configReader.readLine()), thirdPlacePick));
+        }
+
+        input = new FileInputStream("files/" + poolName + "_Master.txt");
+        configReader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
+        String[] roundPicks = new String[31];
+
+        for (int j = 0; j < 31; j++) {
+            roundPicks[j] = configReader.readLine();
+        }
+
+        thirdPlacePick = configReader.readLine();
+        
+        pool = new Pool(nameOfPool, numOfParticipants, numOfTeams, numOfRounds, teams, participants, new Participant(roundPicks, poolName, "Master", 0,thirdPlacePick));
+        
+    }
     
 }

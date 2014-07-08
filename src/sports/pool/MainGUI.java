@@ -25,13 +25,13 @@ public class MainGUI extends JFrame {
     
     JButton createNewPool = new JButton("Create New Pool");
     JButton loadPool = new JButton("Load Pool");
+    JFrame self = this;
     
     public MainGUI() {
         
         setSize(400,200);
         setTitle("Sports Pool");
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
         
         initButtons();
@@ -64,7 +64,7 @@ public class MainGUI extends JFrame {
         loadPool.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent f) {
                 try {
-                    new LoadPoolGUI();
+                    new LoadPoolGUI(self);
                 } catch (IOException ex) {
                     Logger.getLogger(MainGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }

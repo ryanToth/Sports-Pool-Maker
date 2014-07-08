@@ -131,7 +131,7 @@ public class Pool {
 
             for (int i = 0; i < numberOfParticipants; i++) {
 
-                Participant temp = new Participant(teams, nameOfPool, false);
+                Participant temp = new Participant(teams, nameOfPool, false, null);
                 participants.add(temp);
                 writer.println(temp.name);
             }

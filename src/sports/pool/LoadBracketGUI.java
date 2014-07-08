@@ -6,34 +6,17 @@
 
 package sports.pool;
 
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.Collections;
 import java.util.LinkedList;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author Ryan
  */
-public class LoadBracketGUI extends JFrame {
-    
-    JComboBox poolOptions;
-    JButton done = new JButton("Done");
-    LoadBracketGUI sender = this;
-    LinkedList<Participant> participants;
+public class LoadBracketGUI {
     
     public LoadBracketGUI(LinkedList<Participant> participants) {
-        
-        setSize(300,200);
-        setTitle("Select a Participant");
-        setLocationRelativeTo(null);
-        setVisible(true);
-        setLayout(new GridLayout(2,1));
-        
-        this.participants = participants;
         
         LinkedList<String> participantNames = new LinkedList<>();
         
@@ -42,23 +25,17 @@ public class LoadBracketGUI extends JFrame {
         for (int i = 0; i < participants.size(); i++)
             participantNames.add(participants.get(i).name);
         
-        poolOptions = new JComboBox(participantNames.toArray());
+        Collections.sort(participantNames);
         
-        initButtons();
+        String name = (String)JOptionPane.showInputDialog(null, "Select a Participant", "Check Bracket",
+                        JOptionPane.INFORMATION_MESSAGE,
+                        Icon.Icon(), participantNames.toArray(), participantNames.toArray()[0]);
         
-        add(poolOptions);
-        add(done);
-    }
-
-    private final void initButtons() {
-
-        done.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent f) {
-                
-                if (!((String) poolOptions.getSelectedItem()).equals("")) {
-                    new ViewBracketGUI(participants.get(poolOptions.getSelectedIndex()-1));
-                }
+        if (name != null && !name.equals("")) {
+            for (int i = 0; i < participants.size(); i++) {
+                if (name.equals(participants.get(i).name))
+                    new ViewBracketGUI(participants.get(i));
             }
-        });
-    }
+        }
+    }   
 }

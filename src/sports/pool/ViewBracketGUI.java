@@ -19,7 +19,9 @@ import javax.swing.JLabel;
 public class ViewBracketGUI extends JFrame {
     
     JLabel[] teamOptions;
+    JLabel thirdPlaceOptions;
     String[] roundPicks = new String[31];
+    String thirdPlacePick;
     Participant participant;
     
     public ViewBracketGUI(Participant participant) {
@@ -52,6 +54,11 @@ public class ViewBracketGUI extends JFrame {
                 teamOptions[j].setBackground(Color.white);
         }
         
+        thirdPlaceOptions = new JLabel(participant.thirdPlacePick);
+        thirdPlaceOptions.setHorizontalAlignment(JLabel.CENTER);
+        thirdPlaceOptions.setOpaque(true);
+        thirdPlaceOptions.setBorder(BorderFactory.createLineBorder(Color.black));
+        
         int i = 0;
         int j = 0;
         
@@ -67,8 +74,27 @@ public class ViewBracketGUI extends JFrame {
                 add(teamOptions[j]);
                 j++;
             }
-            else add(new JLabel());
-            
+            else if (bracketLayout()[i] == 2) {
+                JLabel tmp = new JLabel("Third Place");
+                tmp.setHorizontalAlignment(JLabel.CENTER);
+                add(tmp);
+            }
+            else if (bracketLayout()[i] == 3) {
+
+                if (participant.thirdPlaceCorrectPick.equals("green")) {
+                    thirdPlaceOptions.setBackground(Color.green);
+                } else if (participant.thirdPlaceCorrectPick.equals("red")) {
+                    thirdPlaceOptions.setBackground(Color.red);
+                } else {
+                    thirdPlaceOptions.setBackground(Color.white);
+                }
+
+                add(thirdPlaceOptions);
+                
+            } else {
+                add(new JLabel());
+            }
+
             i++;
         }
         
@@ -120,8 +146,8 @@ public class ViewBracketGUI extends JFrame {
                                  1,1,0,0,0,
                                  1,1,1,1,0,
                                  1,0,0,0,0,
-                                 1,0,0,0,0,
-                                 1,1,1,0,0,
+                                 1,0,0,0,2,
+                                 1,1,1,0,3,
                                  1,1,0,0,0,
                                  1,0,0,0,0};
         

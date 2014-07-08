@@ -33,16 +33,19 @@ import javax.swing.JLabel;
 public class FillOutBracketGUI extends JFrame {
     
     JComboBox[] teamOptions;
+    JComboBox thirdPlaceOptions;
+    String thirdPlacePick;
     JButton done = new JButton("Done");
     String[] roundPicks = new String[31];
     Participant participant;
     boolean master;
+    JFrame sender;
     
-    public FillOutBracketGUI(String[] teams, Participant participant, boolean master) throws UnsupportedEncodingException, IOException {
+    public FillOutBracketGUI(String[] teams, Participant participant, boolean master, JFrame sender) throws UnsupportedEncodingException, IOException {
         
         setSize(800,500);
         
-        if (!master)
+        if (!master) 
             setTitle(participant.poolName + ": " + participant.name + "'s Bracket");
         else setTitle(participant.poolName + ": " + participant.name + " Bracket");
         setLocationRelativeTo(null);
@@ -50,7 +53,7 @@ public class FillOutBracketGUI extends JFrame {
         setLayout(new GridLayout(18,5));
         
         this.participant = participant;
-        
+        this.sender = sender;
         this.master = master;
         
         teamOptions = new JComboBox[31];
@@ -70,6 +73,8 @@ public class FillOutBracketGUI extends JFrame {
         for (int j = 0; j < teamOptions.length; j++)
             teamOptions[j] = new JComboBox(teams);
         
+        thirdPlaceOptions = new JComboBox(teams);
+        
         int i = 0;
         int j = 0;
         
@@ -85,6 +90,13 @@ public class FillOutBracketGUI extends JFrame {
                 add(teamOptions[j]);
                 j++;
             }
+            else if (bracketLayout()[i] == 2) {
+                JLabel tmp = new JLabel("Third Place");
+                tmp.setHorizontalAlignment(JLabel.CENTER);
+                add(tmp);
+            }
+            else if (bracketLayout()[i] == 3)
+                add(thirdPlaceOptions);
             else add(new JLabel());
             
             i++;
@@ -103,9 +115,13 @@ public class FillOutBracketGUI extends JFrame {
                 for (int l = 0; l < teams.length; l++) {
                     if (roundPicks[k].equals(teams[l])) {
                         teamOptions[k].setSelectedItem(roundPicks[k]);
-                    }
+                    } 
                 }
             }
+            
+            thirdPlacePick = configReader.readLine();
+            if (!thirdPlacePick.equals(""))
+                thirdPlaceOptions.setSelectedItem(thirdPlacePick);
         }
 
         initButton();
@@ -133,8 +149,8 @@ public class FillOutBracketGUI extends JFrame {
                                  1,1,0,0,0,
                                  1,1,1,1,0,
                                  1,0,0,0,0,
-                                 1,0,0,0,0,
-                                 1,1,1,0,0,
+                                 1,0,0,0,2,
+                                 1,1,1,0,3,
                                  1,1,0,0,0,
                                  1,0,0,0,0};
         
@@ -160,13 +176,23 @@ public class FillOutBracketGUI extends JFrame {
                     if (roundPicks[i].equals("")) writer.println("");
                     else writer.println(roundPicks[i]);
                 }
-                
+                thirdPlacePick = (String)thirdPlaceOptions.getSelectedItem();
+                writer.println(thirdPlacePick);
                 writer.println("0");
                 participant.roundPicks = roundPicks;
+                writer.close();
+                
+                if (master) try {
+                    new PoolGUI(participant.poolName);
+                    sender.dispose();
+                } catch (UnsupportedEncodingException ex) {
+                    Logger.getLogger(FillOutBracketGUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(FillOutBracketGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 //Line below cause the IDE to break if commented out for some reason ------------------------------------------
                 //if (!master)
                     participant.closeBracketWindow();
-                writer.close();
             }
         });
             
